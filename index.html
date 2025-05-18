@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Board</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --accent-color: #47b8e0;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --light-text: #666666;
+            --border-color: #e1e4e8;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+        
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+        }
+        
+        .filters {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+        }
+        
+        .filters h2 {
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            flex: 1 1 100px;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .add-job {
+            display: block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 4px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .job-list {
+            margin-top: 24px;
+        }
+        
+        .job-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .job-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .job-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .job-detail {
+            font-size: 14px;
+            color: var(--light-text);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .job-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .job-link:hover {
+            text-decoration: underline;
+        }
+        
+        .job-date {
+            font-size: 12px;
+            color: var(--light-text);
+            margin-top: 8px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .page-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            cursor: pointer;
+        }
+        
+        .page-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        button[type="submit"] {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .no-jobs {
+            text-align: center;
+            padding: 32px 0;
+            color: var(--light-text);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Job Board</h1>
+    </header>
+    
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search jobs...">
+    </div>
+    
+    <div class="filters">
+        <h2>Filters</h2>
+        <div class="filter-row">
+            <div class="filter-item">
+                <input type="text" id="jobTypeFilter" placeholder="Job name">
+            </div>
+            <div class="filter-item">
+                <select id="genderFilter">
+                    <option value="">M/F or Both </option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Both">Both</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <input type="text" id="locationFilter" placeholder="Location">
+            </div>
+        </div>
+        <button class="add-job" id="addJobBtn">(+) Add Job</button>
+    </div>
+    
+    <div id="jobList" class="job-list">
+        <!-- Jobs will be loaded here -->
+    </div>
+    
+    <div class="pagination" id="pagination">
+        <!-- Pagination buttons will be generated here -->
+    </div>
+    
+    <!-- Add Job Modal -->
+    <div class="modal" id="addJobModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Job</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="addJobForm">
+                <div class="form-group">
+                    <label for="jobType">Job Type:</label>
+                    <input type="text" id="jobType" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender Requirement:</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="gender" value="Male" required>
+                            <label for="male">Male</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="gender" value="Female">
+                            <label for="female">Female</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="both" name="gender" value="Both">
+                            <label for="both">Both</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="fbLink">Link to Original Post:</label>
+                    <input type="url" id="fbLink" placeholder="https://facebook.com/..." required>
+                </div>
+                <button type="submit">Add Job</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample initial data
+        const initialJobs = [
+            {
+                id: 1,
+                jobType: "Sample Job 1",
+                gender: "Both",
+                location: "Remote",
+                link: "https://facebook.com",
+                date: "2025-05-18T10:30:00"
+            },
+            {
+                id: 2,
+                jobType: "Sample Job 2",
+                gender: "Female",
+                location: "New York",
+                link: "https://facebook.com",
+                date: "2025-05-17T14:45:00"
+            },
+            {
+                id: 3,
+                jobType: "Sample Job 3",
+                gender: "Male",
+                location: "San Francisco",
+                link: "https://facebook.com",
+                date: "2025-05-16T09:15:00"
+            }
+        ];
+        
+        // Initialize state
+        let jobs = [];
+        let currentPage = 1;
+        const jobsPerPage = 5;
+        
+        // DOM Elements
+        const jobListElement = document.getElementById('jobList');
+        const paginationElement = document.getElementById('pagination');
+        const addJobBtn = document.getElementById('addJobBtn');
+        const addJobModal = document.getElementById('addJobModal');
+        const closeModal = document.getElementById('closeModal');
+        const addJobForm = document.getElementById('addJobForm');
+        const searchInput = document.getElementById('searchInput');
+        const jobTypeFilter = document.getElementById('jobTypeFilter');
+        const genderFilter = document.getElementById('genderFilter');
+        const locationFilter = document.getElementById('locationFilter');
+        
+        // Load jobs from localStorage or use initial data
+        function loadJobs() {
+            const savedJobs = localStorage.getItem('jobs');
+            if (savedJobs) {
+                jobs = JSON.parse(savedJobs);
+            } else {
+                jobs = initialJobs;
+                localStorage.setItem('jobs', JSON.stringify(jobs));
+            }
+            renderJobs();
+        }
+        
+        // Save jobs to localStorage
+        function saveJobs() {
+            localStorage.setItem('jobs', JSON.stringify(jobs));
+        }
+        
+        // Export jobs as JSON file
+        function exportJobs() {
+            const dataStr = JSON.stringify(jobs, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'jobs.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+        
+        // Filter jobs
+        function filterJobs() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const jobType = jobTypeFilter.value.toLowerCase();
+            const gender = genderFilter.value;
+            const location = locationFilter.value.toLowerCase();
+            
+            return jobs.filter(job => {
+                const matchesSearch = job.jobType.toLowerCase().includes(searchTerm) || 
+                                     job.location.toLowerCase().includes(searchTerm);
+                const matchesJobType = jobType === '' || job.jobType.toLowerCase().includes(jobType);
+                const matchesGender = gender === '' || job.gender === gender;
+                const matchesLocation = location === '' || job.location.toLowerCase().includes(location);
+                
+                return matchesSearch && matchesJobType && matchesGender && matchesLocation;
+            });
+        }
+        
+        // Render jobs with pagination
+        function renderJobs() {
+            const filteredJobs = filterJobs();
+            
+            // Sort by date (newest first)
+            filteredJobs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+            const startIndex = (currentPage - 1) * jobsPerPage;
+            const endIndex = startIndex + jobsPerPage;
+            const currentJobs = filteredJobs.slice(startIndex, endIndex);
+            
+            // Clear job list
+            jobListElement.innerHTML = '';
+            
+            // Show message if no jobs
+            if (currentJobs.length === 0) {
+                jobListElement.innerHTML = '<div class="no-jobs">No jobs found. Try adjusting your filters.</div>';
+                return;
+            }
+            
+            // Render each job
+            currentJobs.forEach(job => {
+                const jobDate = new Date(job.date);
+                const formattedDate = formatDate(jobDate);
+                
+                const jobCard = document.createElement('div');
+                jobCard.className = 'job-card';
+                jobCard.innerHTML = `
+                    <div class="job-title">${job.jobType}</div>
+                    <div class="job-info">
+                        <div class="job-detail">👥 ${job.gender}</div>
+                        <div class="job-detail">📍 ${job.location}</div>
+                    </div>
+                    <a href="${job.link}" target="_blank" class="job-link">🔗 Original Post</a>
+                    <div class="job-date">Added ${formattedDate}</div>
+                `;
+                
+                jobListElement.appendChild(jobCard);
+            });
+            
+            // Render pagination
+            renderPagination(totalPages);
+        }
+        
+        // Format date as relative time (today, yesterday, or MM/DD/YYYY)
+        function formatDate(date) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            const jobDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            if (jobDate.getTime() === today.getTime()) {
+                return 'today';
+            } else if (jobDate.getTime() === yesterday.getTime()) {
+                return 'yesterday';
+            } else {
+                return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+            }
+        }
+        
+        // Render pagination buttons
+        function renderPagination(totalPages) {
+            paginationElement.innerHTML = '';
+            
+            if (totalPages <= 1) {
+                return;
+            }
+            
+            // Previous button
+            if (currentPage > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'page-button';
+                prevButton.textContent = '←';
+                prevButton.addEventListener('click', () => {
+                    currentPage--;
+                    renderJobs();
+                });
+                paginationElement.appendChild(prevButton);
+            }
+            
+            // Page buttons
+            for (let i = 1; i <= totalPages; i++) {
+                if (totalPages <= 5 || i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const pageButton = document.createElement('button');
+                    pageButton.className = `page-button ${i === currentPage ? 'active' : ''}`;
+                    pageButton.textContent = i;
+                    pageButton.addEventListener('click', () => {
+                        currentPage = i;
+                        renderJobs();
+                    });
+                    paginationElement.appendChild(pageButton);
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'page-button';
+                    ellipsis.textContent = '...';
+                    paginationElement.appendChild(ellipsis);
+                }
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'page-button';
+                nextButton.textContent = '→';
+                nextButton.addEventListener('click', () => {
+                    currentPage++;
+                    renderJobs();
+                });
+                paginationElement.appendChild(nextButton);
+            }
+        }
+        
+        // Add new job
+        function addJob(e) {
+            e.preventDefault();
+            
+            const jobType = document.getElementById('jobType').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const location = document.getElementById('location').value;
+            const link = document.getElementById('fbLink').value;
+            
+            const newJob = {
+                id: Date.now(), // Use timestamp as ID
+                jobType,
+                gender,
+                location,
+                link,
+                date: new Date().toISOString()
+            };
+            
+            jobs.unshift(newJob); // Add to beginning of array
+            saveJobs();
+            closeAddJobModal();
+            renderJobs();
+        }
+        
+        // Open add job modal
+        function openAddJobModal() {
+            addJobModal.style.display = 'flex';
+        }
+        
+        // Close add job modal
+        function closeAddJobModal() {
+            addJobModal.style.display = 'none';
+            addJobForm.reset();
+        }
+        
+        // Event listeners
+        window.addEventListener('load', loadJobs);
+        addJobBtn.addEventListener('click', openAddJobModal);
+        closeModal.addEventListener('click', closeAddJobModal);
+        addJobForm.addEventListener('submit', addJob);
+        
+        // Filter events
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderJobs();
+        });
+        
+        jobTypeFilter.addEventListener('input', () => {
+            currentPage = 1;
+            renderJobs();
+        });
+        
+        genderFilter.addEventListener('change', () => {
+            currentPage = 1;
+            renderJobs();
+        });
+        
+        locationFilter.addEventListener('input', () => {
+            currentPage = 1;
+            renderJobs();
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', event => {
+            if (event.target === addJobModal) {
+                closeAddJobModal();
+            }
+        });
+    </script>
+</body>
+</html>
